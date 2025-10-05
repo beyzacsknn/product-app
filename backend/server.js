@@ -48,7 +48,7 @@ app.get("/api/products", async (req, res) => {
 });
 
 
-const frontendPath = path.join(__dirname, "frontend", "dist");
+const frontendPath = path.join(__dirname, "..", "frontend", "dist");
 app.use(express.static(frontendPath));
 
 app.use((req, res, next) => {
