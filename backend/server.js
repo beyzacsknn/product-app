@@ -2,38 +2,37 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const axios = require("axios");
+const path = require("path");
 require("dotenv").config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 
 const GOLD_API_KEY = process.env.GOLD_API_KEY;
 
-
 async function getGoldPrice() {
   try {
     const response = await axios.get("https://www.goldapi.io/api/XAU/USD", {
-      headers: { "x-access-token": process.env.GOLD_API_KEY }
+      headers: { "x-access-token": GOLD_API_KEY },
     });
-
     return response.data.price_gram_24k;
-
   } catch (error) {
     console.error("Altın fiyatı alınamadı:", error);
     return 65;
   }
 }
 
-
 app.get("/api/products", async (req, res) => {
   try {
-    const productsData = JSON.parse(fs.readFileSync("data/products.json", "utf8"));
+    const productsData = JSON.parse(
+      fs.readFileSync(path.join(__dirname, "data", "products.json"), "utf8")
+    );
     const goldPrice = await getGoldPrice();
 
     const products = productsData.map((p) => {
-      const price = (p.popularityScore + 1) * p.weight * goldPrice; 
+      const price = (p.popularityScore + 1) * p.weight * goldPrice;
       return {
         ...p,
         price: price.toFixed(2),
@@ -48,6 +47,12 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
+app.use(express.static(path.join(__dirname, "frontend/dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend/dist/index.html"));
+});
+
 app.listen(PORT, () => {
-  console.log(` Backend API çalışıyor: http://localhost:${PORT}/api/products`);
+  console.log(`Backend + Frontend çalışıyor: http://localhost:${PORT}`);
 });

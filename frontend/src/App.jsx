@@ -10,11 +10,12 @@ export default function App() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products")
-      .then((res) => res.json())
-      .then((data) => setProducts(data))
-      .catch((err) => console.error(err));
-  }, []);
+  fetch("/api/products") 
+    .then((res) => res.json())
+    .then((data) => setProducts(data))
+    .catch((err) => console.error(err));
+}, []);
+
 
   return (
     <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
