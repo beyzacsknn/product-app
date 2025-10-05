@@ -11,15 +11,14 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 
 const GOLD_API_KEY = process.env.GOLD_API_KEY;
-
 async function getGoldPrice() {
   try {
     const response = await axios.get("https://www.goldapi.io/api/XAU/USD", {
       headers: { "x-access-token": GOLD_API_KEY },
     });
     return response.data.price_gram_24k;
-  } catch (error) {
-    console.error("Altın fiyatı alınamadı:", error);
+  } catch (err) {
+    console.error("Altın fiyatı alınamadı:", err);
     return 65;
   }
 }
@@ -48,10 +47,9 @@ app.get("/api/products", async (req, res) => {
 });
 
 const frontendPath = path.join(__dirname, "frontend/dist");
-
 app.use(express.static(frontendPath));
 
-app.get("/*", (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
