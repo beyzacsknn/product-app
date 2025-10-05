@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 
 const GOLD_API_KEY = process.env.GOLD_API_KEY;
+
 async function getGoldPrice() {
   try {
     const response = await axios.get("https://www.goldapi.io/api/XAU/USD", {
@@ -18,7 +19,7 @@ async function getGoldPrice() {
     });
     return response.data.price_gram_24k;
   } catch (err) {
-    console.error("Altın fiyatı alınamadı:", err);
+    console.error("Altın fiyatı alınamadı:", err.message);
     return 65;
   }
 }
@@ -41,18 +42,25 @@ app.get("/api/products", async (req, res) => {
 
     res.json(products);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Sunucu hatası" });
+    console.error("Ürün listesi alınırken hata oluştu:", err);
+    res.status(500).json({ message: "Sunucu hatası: Ürünler yüklenemedi." });
   }
 });
 
+
 const frontendPath = path.join(__dirname, "frontend/dist");
+
 app.use(express.static(frontendPath));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+
+app.get("/*", (req, res) => {
+  if (fs.existsSync(path.join(frontendPath, "index.html"))) {
+    res.sendFile(path.join(frontendPath, "index.html"));
+  } else {
+    res.status(404).send("Frontend dosyaları bulunamıyor. Lütfen build komutunuzu kontrol edin.");
+  }
 });
 
 app.listen(PORT, () => {
-  console.log(`Backend + Frontend çalışıyor: http://localhost:${PORT}`);
+  console.log(`Sunucu ${PORT} portunda çalışıyor.`);
 });
