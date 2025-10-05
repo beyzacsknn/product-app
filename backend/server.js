@@ -49,16 +49,10 @@ app.get("/api/products", async (req, res) => {
 
 
 const frontendPath = path.join(__dirname, "frontend/dist");
-
 app.use(express.static(frontendPath));
 
-
-app.get("/*", (req, res) => {
-  if (fs.existsSync(path.join(frontendPath, "index.html"))) {
-    res.sendFile(path.join(frontendPath, "index.html"));
-  } else {
-    res.status(404).send("Frontend dosyaları bulunamıyor. Lütfen build komutunuzu kontrol edin.");
-  }
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 app.listen(PORT, () => {
